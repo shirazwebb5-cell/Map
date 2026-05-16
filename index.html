@@ -314,11 +314,11 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" action="https://formsubmit.co/ajax/shirazwebb5@gmail.com" method="POST" novalidate>
+    <form id="leadForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
       
-      <input type="hidden" name="_subject" value="ליד חדש — בקשת מפה" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="access_key" value="5b38bdbe-56f3-4264-9480-4bb3be8b444c">
+      <input type="hidden" name="subject" value="ליד חדש — בקשת מפה">
+      <input type="hidden" name="from_name" value="האתר של שירז">
 
       <div class="form-grid">
 
@@ -450,7 +450,7 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         form.classList.add('was-validated');
 
@@ -463,25 +463,26 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'שולח פרטים...';
 
-        const formData = new FormData(form);
+        try {
+          const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
 
-        fetch(form.action, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json'
-          },
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          form.style.display = 'none';
-          successScr.style.display = 'flex';
-        })
-        .catch(error => {
+          if (response.ok) {
+            form.style.display = 'none';
+            successScr.style.display = 'flex';
+          } else {
+            throw new Error('Server error');
+          }
+        } catch (err) {
           submitBtn.disabled = false;
           submitBtn.textContent = 'אני רוצה את המפה!';
-          alert('אירעה שגיאה. בדוק שלא חסמת פופאפים או נסה שוב.');
-        });
+          alert('אירעה שגיאה בחיבור לשרת. אנא נסה שוב.');
+        }
       });
     })();
   </script>
