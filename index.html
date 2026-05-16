@@ -8,7 +8,12 @@
   <meta property="og:title" content="קבלו את המפה שלכם בחינם" />
   <meta property="og:description" content="מלאו את הטופס וקבלו את מפת היעד שלכם בחינם" />
   <meta property="og:type" content="website" />
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="format-detection" content="telephone=no" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -314,7 +319,9 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" novalidate>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+    <form id="leadForm" action="https://api.web3forms.com/submit" method="POST" target="hidden_iframe" novalidate>
       
       <input type="hidden" name="access_key" value="5b38bdbe-56f3-4264-9480-4bb3be8b444c">
       <input type="hidden" name="subject" value="New Map Request - ליד חדש">
@@ -433,12 +440,14 @@
 
   <script>
     (() => {
+      let submitted = false;
       const form        = document.getElementById('leadForm');
       const flightSel   = document.getElementById('flightTime');
       const styleSel    = document.getElementById('travelStyle');
       const otherWrap   = document.getElementById('otherDetailWrap');
       const submitBtn   = document.getElementById('submitBtn');
       const successScr  = document.getElementById('successScreen');
+      const iframe      = document.getElementById('hidden_iframe');
 
       function checkOther() {
         const show = flightSel.value === 'אחר' || styleSel.value === 'אחר';
@@ -450,44 +459,26 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        form.classList.add('was-validated');
-
+      // כשהגולש לוחץ שליחה - אנחנו מאשרים לטופס להישלח בטבעיות לדפדפן הנסתר
+      form.addEventListener('submit', (e) => {
         if (!form.checkValidity()) {
+          e.preventDefault();
+          form.classList.add('was-validated');
           const first = form.querySelector(':invalid');
           first?.focus();
           return;
         }
 
+        submitted = true;
         submitBtn.disabled = true;
         submitBtn.textContent = 'שולח פרטים...';
+      });
 
-        // הופך את הנתונים לפורמט שטיקטוק לא חוסם
-        const formData = new FormData(form);
-        const object = Object.fromEntries(formData);
-        const json = JSON.stringify(object);
-
-        try {
-          const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: json
-          });
-
-          if (response.status === 200) {
-            form.style.display = 'none';
-            successScr.style.display = 'flex';
-          } else {
-            throw new Error('Server error');
-          }
-        } catch (err) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'אני רוצה את המפה!';
-          alert('אירעה שגיאה זמנית בשליחת הטופס. אנא נסה שוב.');
+      // כשהדפדפן הנסתר מסיים לטעון את התשובה מ-Web3Forms, אנחנו מציגים את ההצלחה
+      iframe.addEventListener('load', () => {
+        if (submitted) {
+          form.style.display = 'none';
+          successScr.style.display = 'flex';
         }
       });
     })();
