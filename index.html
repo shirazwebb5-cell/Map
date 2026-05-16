@@ -314,34 +314,33 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+    <form id="leadForm" novalidate>
       
       <input type="hidden" name="access_key" value="5b38bdbe-56f3-4264-9480-4bb3be8b444c">
-      <input type="hidden" name="subject" value="ליד חדש — בקשת מפה">
-      <input type="hidden" name="from_name" value="האתר של שירז">
-      <input type="hidden" name="redirect" value="https://shirazwebb5-cell.github.io/Map/?success=true">
+      <input type="hidden" name="subject" value="New Map Request - ליד חדש">
+      <input type="hidden" name="from_name" value="Landing Page">
 
       <div class="form-grid">
 
         <div class="field">
           <label for="fullName">שם מלא <span class="req">*</span></label>
-          <input type="text" id="fullName" name="שם מלא" placeholder="ישראל ישראלי" required />
+          <input type="text" id="fullName" name="Full_Name" placeholder="ישראל ישראלי" required />
         </div>
 
         <div class="field">
           <label for="email">אימייל <span class="req">*</span></label>
-          <input type="email" id="email" name="אימייל" placeholder="you@example.com" required dir="ltr" style="text-align:right;" />
+          <input type="email" id="email" name="Email_Address" placeholder="you@example.com" required dir="ltr" style="text-align:right;" />
         </div>
 
         <div class="field">
           <label for="whatsapp">מספר וואטסאפ <span class="req">*</span></label>
-          <input type="tel" id="whatsapp" name="מספר וואטסאפ" placeholder="050-0000000" required inputmode="tel" dir="ltr" style="text-align:right;" />
+          <input type="tel" id="whatsapp" name="WhatsApp_Number" placeholder="050-0000000" required inputmode="tel" dir="ltr" style="text-align:right;" />
         </div>
 
         <div class="field">
           <label for="flightTime">מועד טיסה משוער</label>
           <div class="select-wrap">
-            <select id="flightTime" name="מועד טיסה משוער">
+            <select id="flightTime" name="Estimated_Flight">
               <option value="" disabled selected>בחרו מועד...</option>
               <option value="בחודש הקרוב">בחודש הקרוב</option>
               <option value="בחצי שנה הקרובה">בחצי שנה הקרובה</option>
@@ -354,7 +353,7 @@
         <div class="field">
           <label for="travelStyle">סגנון טיול</label>
           <div class="select-wrap">
-            <select id="travelStyle" name="סגנון טיול">
+            <select id="travelStyle" name="Travel_Style">
               <option value="" disabled selected>בחרו סגנון...</option>
               <option value="תרמילאים">תרמילאים</option>
               <option value="זוגות">זוגות</option>
@@ -367,13 +366,13 @@
 
         <div class="conditional-field field" id="otherDetailWrap">
           <label for="otherDetail">אם בחרת 'אחר' — פרט כאן</label>
-          <input type="text" id="otherDetail" name="פירוט נוסף (אחר)" placeholder="ספרו לנו..." />
+          <input type="text" id="otherDetail" name="Other_Details" placeholder="ספרו לנו..." />
         </div>
 
         <div class="field">
           <label for="mapChoice">בחירת מפה <span class="req">*</span></label>
           <div class="select-wrap">
-            <select id="mapChoice" name="המפה המבוקשת" required>
+            <select id="mapChoice" name="Requested_Map" required>
               <option value="" disabled selected>בחרו יעד...</option>
               <option value="וינה (אוסטריה)">וינה (אוסטריה)</option>
               <option value="פירנצה (איטליה)">פירנצה (איטליה)</option>
@@ -406,7 +405,7 @@
 
         <div class="field">
           <label class="checkbox-wrap">
-            <input type="checkbox" id="terms" name="אישור תקנון" required />
+            <input type="checkbox" id="terms" name="Terms_Approved" required />
             <span class="checkbox-label">
               אני מאשר/ת קריאה של <a href="#תקנון" style="color:var(--blue); font-weight:600; text-decoration:none;">התקנון</a> ומסכים/ה לקבל עדכונים.
             </span>
@@ -441,14 +440,6 @@
       const submitBtn   = document.getElementById('submitBtn');
       const successScr  = document.getElementById('successScreen');
 
-      // בודק אם הגולש הרגע חזר מהשליחה של הטופס
-      if (window.location.search.includes('success=true')) {
-        form.style.display = 'none';
-        successScr.style.display = 'flex';
-        // מנקה את שורת הכתובת למעלה שייראה מקצועי
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-
       function checkOther() {
         const show = flightSel.value === 'אחר' || styleSel.value === 'אחר';
         otherWrap.classList.toggle('visible', show);
@@ -459,16 +450,44 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      form.addEventListener('submit', (e) => {
-        // הדפדפן יעשה את השליחה הטבעית, אנחנו רק בודקים שכל השדות מלאים
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        form.classList.add('was-validated');
+
         if (!form.checkValidity()) {
-          e.preventDefault();
-          form.classList.add('was-validated');
           const first = form.querySelector(':invalid');
           first?.focus();
-        } else {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'שולח פרטים...';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'שולח פרטים...';
+
+        // הופך את הנתונים לפורמט שטיקטוק לא חוסם
+        const formData = new FormData(form);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        try {
+          const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: json
+          });
+
+          if (response.status === 200) {
+            form.style.display = 'none';
+            successScr.style.display = 'flex';
+          } else {
+            throw new Error('Server error');
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'אני רוצה את המפה!';
+          alert('אירעה שגיאה זמנית בשליחת הטופס. אנא נסה שוב.');
         }
       });
     })();
