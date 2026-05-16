@@ -519,7 +519,7 @@
           <label class="checkbox-wrap">
             <input type="checkbox" id="terms" name="Terms_Approved" required />
             <span class="checkbox-label">
-              אני מאשר/ת קריאה של <a href="#תקנון" id="openTermsModal" style="color:var(--blue); font-weight:600; text-decoration:none;">התקנון</a> ומסכים/ה לקבל עדכונים.
+              אני מאשר/ת קריאה של <a href="#תקנון" id="openTermsModal" style="color:var(--blue); font-weight:600; text-decoration:none; position:relative; z-index:10;">התקנון</a> ומסכים/ה לקבל עדכונים.
             </span>
           </label>
         </div>
@@ -616,9 +616,10 @@
       const termsModal  = document.getElementById('termsModal');
       const closeTerms  = document.getElementById('closeTermsBtn');
 
-      // פתיחת מודאל תקנון
+      // פתיחת מודאל תקנון - מונע את סימון ה-V בתיבה!
       termsLink.addEventListener('click', (e) => {
         e.preventDefault();
+        e.stopPropagation(); // <-- זה מה שמתקן את הבעיה! 
         termsModal.classList.add('active');
       });
 
