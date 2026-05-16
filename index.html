@@ -305,6 +305,111 @@
       body { padding: 0; }
       .card { border-radius: 0; box-shadow: none; padding: 28px 20px; min-height: 100dvh; }
     }
+
+    /* ── פופ-אפ תקנון ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      color: var(--text-main);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .close-modal:hover {
+      color: #EF4444;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      font-size: 14px;
+      color: var(--text-main);
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .modal-body h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    
+    .modal-body h4 {
+      font-size: 15px;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      color: var(--blue);
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 4px;
+    }
+
+    .modal-body p {
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    .modal-body ul {
+      margin-right: 20px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    .modal-body li {
+      margin-bottom: 6px;
+    }
   </style>
 </head>
 
@@ -414,7 +519,7 @@
           <label class="checkbox-wrap">
             <input type="checkbox" id="terms" name="Terms_Approved" required />
             <span class="checkbox-label">
-              אני מאשר/ת קריאה של <a href="#תקנון" style="color:var(--blue); font-weight:600; text-decoration:none;">התקנון</a> ומסכים/ה לקבל עדכונים.
+              אני מאשר/ת קריאה של <a href="#תקנון" id="openTermsModal" style="color:var(--blue); font-weight:600; text-decoration:none;">התקנון</a> ומסכים/ה לקבל עדכונים.
             </span>
           </label>
         </div>
@@ -438,6 +543,64 @@
 
   </div>
 
+  <div class="modal-overlay" id="termsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>תקנון ומדיניות פרטיות</h2>
+        <button class="close-modal" id="closeTermsBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>תקנון ומדיניות פרטיות — Shiraz Travel</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">עודכן לאחרונה: מאי 2026</p>
+        
+        <h4>1. כללי</h4>
+        <p>תקנון זה מסדיר את השימוש בטופס איסוף הפרטים המופיע באתר ובערוצי השיווק של Shiraz Travel (להלן: "החברה"), המנוהלת על ידי עוסק פטור רשום בישראל. מילוי הטופס ולחיצה על כפתור האישור מהווים הסכמה מלאה, מפורשת ומודעת לכל האמור בתקנון זה.</p>
+        
+        <h4>2. המוצר המוענק</h4>
+        <p>בתמורה למילוי הטופס, יקבל המשתמש מפה דיגיטלית של היעד שבחר, ללא תשלום. המפה תישלח לכתובת המייל שהוזנה בטופס. החברה שומרת לעצמה את הזכות לשנות, לעדכן או להפסיק את מתן המפות בכל עת, ללא הודעה מוקדמת.</p>
+        
+        <h4>3. הסכמה לקבלת תוכן שיווקי</h4>
+        <p>על ידי מילוי הטופס ואישור תקנון זה, המשתמש מסכים באופן מפורש לקבל מהחברה ומטעמה:</p>
+        <ul>
+          <li>עדכונים, מבצעים והטבות בנושאי טיולים ותיירות</li>
+          <li>הצעות מותאמות אישית בהתאם להעדפות שנמסרו בטופס</li>
+          <li>תוכן שיווקי ופרסומי, לרבות ממוצרים ושירותים של צדדים שלישיים</li>
+        </ul>
+        <p>התוכן יישלח באמצעות: דואר אלקטרוני (מייל), וואטסאפ, ו/או SMS, לפי פרטי הקשר שהוזנו בטופס. הסכמה זו ניתנת מרצון חופשי ובמודע, בהתאם לחוק התקשורת (בזק ושידורים), התשמ"ב-1982 ותיקוניו.</p>
+        
+        <h4>4. שיתוף מידע עם צדדים שלישיים</h4>
+        <p>המשתמש מסכים ומאשר במפורש כי החברה רשאית להעביר את פרטיו האישיים (שם, מייל, מספר טלפון, והעדפות טיול) לגורמים שלישיים, לרבות:</p>
+        <ul>
+          <li>חברות תיירות, סוכנויות נסיעות ומארגני טיולים</li>
+          <li>חברות ביטוח נסיעות</li>
+          <li>ספקי שירותים בתחום הנסיעות והפנאי</li>
+          <li>גורמים שיווקיים ופרסומיים הפועלים בשיתוף פעולה עם החברה</li>
+        </ul>
+        <p>העברת המידע נועדת לאפשר למשתמש לקבל הצעות והטבות רלוונטיות. המשתמש מאשר כי ידוע לו שגורמים אלו עשויים לפנות אליו ישירות. החברה תדאג כי כל צד שלישי שיקבל את המידע יתחייב לשמור עליו בהתאם לדרישות הדין.</p>
+        
+        <h4>5. הסרה מרשימת התפוצה</h4>
+        <p>המשתמש רשאי בכל עת להסיר את עצמו מרשימת התפוצה באמצעות:</p>
+        <ul>
+          <li>פנייה ישירה לכתובת: shirazwebb5@gmail.com</li>
+        </ul>
+        <p>הסרה מרשימת התפוצה לא תחייב את החברה להשמיד את המידע שנמסר, אלא להפסיק את המשלוח השיווקי בלבד.</p>
+        
+        <h4>6. אחריות</h4>
+        <p>החברה אינה אחראית לכל נזק ישיר, עקיף או תוצאתי הנובע משימוש במידע שהתקבל מהמפות או מהתכנים השיווקיים. המפות מסופקות כמידע כללי בלבד ואינן מהוות ייעוץ מקצועי. החברה אינה אחראית לתכנים או לשירותים של צדדים שלישיים שאליהם הועבר המידע.</p>
+        
+        <h4>7. שינויים בתקנון</h4>
+        <p>החברה רשאית לעדכן תקנון זה בכל עת. גרסה עדכנית תמיד תופיע בדף זה. המשך השימוש בשירות לאחר שינוי התקנון מהווה הסכמה לשינויים.</p>
+        
+        <h4>8. יצירת קשר</h4>
+        <p>לכל שאלה או פנייה בנוגע לתקנון זה ולמדיניות הפרטיות:<br>
+        <strong>Shiraz Travel</strong><br>
+        📧 shirazwebb5@gmail.com</p>
+        
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 20px; border-top: 1px solid var(--border); padding-top: 8px;">תקנון זה נכתב בהתאם לחוק הגנת הפרטיות, התשמ"א-1981, תיקון מספר 13 (2023), וחוק התקשורת (בזק ושידורים), התשמ"ב-1982.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     (() => {
       let submitted = false;
@@ -448,6 +611,27 @@
       const submitBtn   = document.getElementById('submitBtn');
       const successScr  = document.getElementById('successScreen');
       const iframe      = document.getElementById('hidden_iframe');
+      
+      const termsLink   = document.getElementById('openTermsModal');
+      const termsModal  = document.getElementById('termsModal');
+      const closeTerms  = document.getElementById('closeTermsBtn');
+
+      // פתיחת מודאל תקנון
+      termsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        termsModal.classList.add('active');
+      });
+
+      // סגירת מודאל
+      closeTerms.addEventListener('click', () => {
+        termsModal.classList.remove('active');
+      });
+
+      termsModal.addEventListener('click', (e) => {
+        if (e.target === termsModal) {
+          termsModal.classList.remove('active');
+        }
+      });
 
       function checkOther() {
         const show = flightSel.value === 'אחר' || styleSel.value === 'אחר';
@@ -459,7 +643,6 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      // כשהגולש לוחץ שליחה - אנחנו מאשרים לטופס להישלח בטבעיות לדפדפן הנסתר
       form.addEventListener('submit', (e) => {
         if (!form.checkValidity()) {
           e.preventDefault();
@@ -474,7 +657,6 @@
         submitBtn.textContent = 'שולח פרטים...';
       });
 
-      // כשהדפדפן הנסתר מסיים לטעון את התשובה מ-Web3Forms, אנחנו מציגים את ההצלחה
       iframe.addEventListener('load', () => {
         if (submitted) {
           form.style.display = 'none';
