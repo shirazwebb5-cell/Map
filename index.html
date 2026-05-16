@@ -245,6 +245,51 @@
       background: var(--blue-dark);
     }
 
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 0 10px;
+      gap: 14px;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #EEF2FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--blue);
+    }
+
+    .success-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 320px;
+    }
+
     .was-validated input:invalid,
     .was-validated select:invalid,
     .was-validated input[type="checkbox"]:invalid {
@@ -269,11 +314,7 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" action="https://formsubmit.co/shirazwebb5@gmail.com" method="POST">
-      
-      <input type="hidden" name="_subject" value="ליד חדש — בקשת מפה" />
-      <input type="hidden" name="_captcha" value="false" />
-
+    <form id="leadForm" action="https://api.slapform.com/shirazwebb5@gmail.com" method="POST" novalidate>
       <div class="form-grid">
 
         <div class="field">
@@ -372,6 +413,17 @@
 
       </div>
     </form>
+
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p class="success-title">נשלח בהצלחה! 🎉</p>
+      <p class="success-sub">תודה! הפרטים התקבלו במערכת והמפה תישלח אליכם בהקדם.</p>
+    </div>
+
   </div>
 
   <script>
@@ -381,6 +433,7 @@
       const styleSel    = document.getElementById('travelStyle');
       const otherWrap   = document.getElementById('otherDetailWrap');
       const submitBtn   = document.getElementById('submitBtn');
+      const successScr  = document.getElementById('successScreen');
 
       function checkOther() {
         const show = flightSel.value === 'אחר' || styleSel.value === 'אחר';
@@ -392,15 +445,35 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        form.classList.add('was-validated');
+
         if (!form.checkValidity()) {
-          e.preventDefault();
-          form.classList.add('was-validated');
           const first = form.querySelector(':invalid');
           first?.focus();
-        } else {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'שולח פרטים...';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'שולח פרטים...';
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form)
+          });
+
+          if (response.ok) {
+            form.style.display = 'none';
+            successScr.style.display = 'flex';
+          } else {
+            throw new Error('Submission failed');
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'אני רוצה את המפה!';
+          alert('אירעה שגיאה זמנית בשילוח. אנא נסו שוב בעוד רגע.');
         }
       });
     })();
