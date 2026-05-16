@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>קבלו את המפה שלכם בחינם</title>
   <meta name="description" content="מלאו את הטופס וקבלו את מפת היעד שלכם בחינם" />
-  <!-- Open Graph / TikTok sharing -->
   <meta property="og:title" content="קבלו את המפה שלכם בחינם" />
   <meta property="og:description" content="מלאו את הטופס וקבלו את מפת היעד שלכם בחינם" />
   <meta property="og:type" content="website" />
-  <!-- Prevent TikTok in-app browser from blocking the form -->
   <meta name="format-detection" content="telephone=no" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -384,11 +382,6 @@
       display: none;
     }
 
-    input:invalid:not(:placeholder-shown),
-    select:invalid {
-      /* no red border by default — only after submit attempt */
-    }
-
     .was-validated input:invalid,
     .was-validated select:invalid,
     .was-validated input[type="checkbox"]:invalid {
@@ -411,7 +404,6 @@
 <body>
   <div class="card">
 
-    <!-- Header -->
     <div class="card-header">
       <p class="eyebrow">✈ הרפתקאות ממפות</p>
       <h1 class="card-title">קבלו את המפה שלכם<br>בחינם — עכשיו</h1>
@@ -420,17 +412,9 @@
 
     <div class="divider"></div>
 
-    <!-- Form -->
-<form id="leadForm" style="display: none;"></form>
-
-<form action="mailto:shirazwebb5@gmail.com" method="POST" enctype="text/plain" novalidate>      <!-- Formspree: send replies to this address -->
-      <input type="hidden" name="_replyto" value="shirazwebb5@gmail.com" />
-      <!-- Formspree: subject line in inbox -->
-      <input type="hidden" name="_subject" value="ליד חדש — בקשת מפה" />
-
+    <form id="leadForm" novalidate>
       <div class="form-grid">
 
-        <!-- 1. Full name -->
         <div class="field">
           <label for="fullName">שם מלא <span class="req">*</span></label>
           <input
@@ -443,7 +427,6 @@
           />
         </div>
 
-        <!-- 2. Email -->
         <div class="field">
           <label for="email">אימייל <span class="req">*</span></label>
           <input
@@ -458,7 +441,6 @@
           />
         </div>
 
-        <!-- 3. WhatsApp -->
         <div class="field">
           <label for="whatsapp">מספר וואטסאפ <span class="req">*</span></label>
           <input
@@ -475,7 +457,6 @@
           />
         </div>
 
-        <!-- 4. Flight timing -->
         <div class="field">
           <label for="flightTime">מועד טיסה משוער</label>
           <div class="select-wrap">
@@ -489,7 +470,6 @@
           </div>
         </div>
 
-        <!-- 5. Travel style -->
         <div class="field">
           <label for="travelStyle">סגנון טיול</label>
           <div class="select-wrap">
@@ -504,7 +484,6 @@
           </div>
         </div>
 
-        <!-- 6. Conditional "other" field -->
         <div class="conditional-field field" id="otherDetailWrap">
           <label for="otherDetail">אם בחרת 'אחר' — פרט כאן</label>
           <input
@@ -515,7 +494,6 @@
           />
         </div>
 
-        <!-- 7. Map selection -->
         <div class="field">
           <label for="mapChoice">בחירת מפה <span class="req">*</span></label>
           <div class="select-wrap">
@@ -550,7 +528,6 @@
           </div>
         </div>
 
-        <!-- 8. Terms checkbox -->
         <div class="field">
           <label class="checkbox-wrap">
             <input type="checkbox" id="terms" name="terms" required />
@@ -562,15 +539,13 @@
           </label>
         </div>
 
-        <!-- 9. Submit -->
         <button type="submit" class="btn-submit" id="submitBtn">
           אני רוצה את המפה!
         </button>
 
-      </div><!-- /form-grid -->
+      </div>
     </form>
 
-    <!-- Success screen (shown after submit) -->
     <div class="success-screen" id="successScreen">
       <div class="success-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -578,10 +553,10 @@
         </svg>
       </div>
       <p class="success-title">נשלח בהצלחה! 🎉</p>
-      <p class="success-sub">תודה! נשלח לכם את המפה בהקדם.<br>בדקו את תיבת הדואר הנכנס שלכם.</p>
+      <p class="success-sub">אפליקציית המייל נפתחת כעת.<br>לחצו על "שליחה" כדי להעביר את הפרטים אלינו.</p>
     </div>
 
-  </div><!-- /card -->
+  </div>
 
   <script>
     (() => {
@@ -592,7 +567,6 @@
       const submitBtn   = document.getElementById('submitBtn');
       const successScr  = document.getElementById('successScreen');
 
-      /* ── Conditional "other" field ── */
       function checkOther() {
         const show = flightSel.value === 'אחר' || styleSel.value === 'אחר';
         otherWrap.classList.toggle('visible', show);
@@ -603,7 +577,6 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      /* ── Ripple on submit button ── */
       submitBtn.addEventListener('click', function (e) {
         const btn = this;
         const circle = document.createElement('span');
@@ -621,15 +594,11 @@
         setTimeout(() => circle.remove(), 600);
       });
 
-      /* ── Form submit ── */
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
-
-        // Mark as validated for CSS
         form.classList.add('was-validated');
 
         if (!form.checkValidity()) {
-          // Focus first invalid field
           const first = form.querySelector(':invalid');
           first?.focus();
           return;
@@ -638,24 +607,32 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'שולח...';
 
-        try {
-          const res = await fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: { Accept: 'application/json' }
-          });
-
-          if (res.ok) {
-            form.style.display = 'none';
-            successScr.style.display = 'flex';
-          } else {
-            throw new Error('server error');
-          }
-        } catch {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'אני רוצה את המפה!';
-          alert('אירעה שגיאה. אנא נסו שוב.');
+        const formData = new FormData(form);
+        const fields = {
+          fullName: "שם מלא",
+          email: "אימייל",
+          whatsapp: "מספר וואטסאפ",
+          flightTime: "מועד טיסה משוער",
+          travelStyle: "סגנון טיול",
+          otherDetail: "פירוט (אחר)",
+          mapChoice: "המפה המבוקשת"
+        };
+        
+        let bodyText = "התקבלו פרטים חדשים מטופס נחיתה:\n\n";
+        for (let [key, value] of formData.entries()) {
+          if (key === 'terms' || !value) continue;
+          const label = fields[key] || key;
+          bodyText += `${label}: ${value}\n`;
         }
+        
+        const mailtoUrl = `mailto:shirazwebb5@gmail.com?subject=${encodeURIComponent('ליד חדש — בקשת מפה')}&body=${encodeURIComponent(bodyText)}`;
+        
+        // Open the native email application safely via link change
+        window.location.href = mailtoUrl;
+
+        // Transition to success screen
+        form.style.display = 'none';
+        successScr.style.display = 'flex';
       });
     })();
   </script>
