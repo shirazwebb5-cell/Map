@@ -314,7 +314,12 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" action="https://api.slapform.com/shirazwebb5@gmail.com" method="POST" novalidate>
+    <form id="leadForm" action="https://formsubmit.co/ajax/shirazwebb5@gmail.com" method="POST" novalidate>
+      
+      <input type="hidden" name="_subject" value="ליד חדש — בקשת מפה" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_template" value="table" />
+
       <div class="form-grid">
 
         <div class="field">
@@ -445,7 +450,7 @@
       flightSel.addEventListener('change', checkOther);
       styleSel.addEventListener('change', checkOther);
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
         form.classList.add('was-validated');
 
@@ -458,23 +463,25 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'שולח פרטים...';
 
-        try {
-          const response = await fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form)
-          });
+        const formData = new FormData(form);
 
-          if (response.ok) {
-            form.style.display = 'none';
-            successScr.style.display = 'flex';
-          } else {
-            throw new Error('Submission failed');
-          }
-        } catch (err) {
+        fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json'
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          form.style.display = 'none';
+          successScr.style.display = 'flex';
+        })
+        .catch(error => {
           submitBtn.disabled = false;
           submitBtn.textContent = 'אני רוצה את המפה!';
-          alert('אירעה שגיאה זמנית בשילוח. אנא נסו שוב בעוד רגע.');
-        }
+          alert('אירעה שגיאה. בדוק שלא חסמת פופאפים או נסה שוב.');
+        });
       });
     })();
   </script>
