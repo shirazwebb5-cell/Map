@@ -375,13 +375,6 @@
     }
 
     /* ── Error message ── */
-    .field-error {
-      font-size: 12px;
-      color: #EF4444;
-      font-weight: 500;
-      display: none;
-    }
-
     .was-validated input:invalid,
     .was-validated select:invalid,
     .was-validated input[type="checkbox"]:invalid {
@@ -412,7 +405,11 @@
 
     <div class="divider"></div>
 
-    <form id="leadForm" novalidate>
+    <form id="leadForm" action="https://formsubmit.co/ajax/shirazwebb5@gmail.com" method="POST" novalidate>
+      
+      <input type="hidden" name="_subject" value="ליד חדש — בקשת מפה" />
+      <input type="hidden" name="_honeypot" value="" />
+
       <div class="form-grid">
 
         <div class="field">
@@ -420,7 +417,7 @@
           <input
             type="text"
             id="fullName"
-            name="fullName"
+            name="שם מלא"
             placeholder="ישראל ישראלי"
             required
             autocomplete="name"
@@ -432,7 +429,7 @@
           <input
             type="email"
             id="email"
-            name="email"
+            name="אימייל"
             placeholder="you@example.com"
             required
             autocomplete="email"
@@ -446,7 +443,7 @@
           <input
             type="tel"
             id="whatsapp"
-            name="whatsapp"
+            name="מספר וואטסאפ"
             placeholder="050-0000000"
             required
             pattern="[0-9+\-\s]{7,15}"
@@ -460,7 +457,7 @@
         <div class="field">
           <label for="flightTime">מועד טיסה משוער</label>
           <div class="select-wrap">
-            <select id="flightTime" name="flightTime">
+            <select id="flightTime" name="מועד טיסה משוער">
               <option value="" disabled selected>בחרו מועד...</option>
               <option value="בחודש הקרוב">בחודש הקרוב</option>
               <option value="בחצי שנה הקרובה">בחצי שנה הקרובה</option>
@@ -473,7 +470,7 @@
         <div class="field">
           <label for="travelStyle">סגנון טיול</label>
           <div class="select-wrap">
-            <select id="travelStyle" name="travelStyle">
+            <select id="travelStyle" name="סגנון טיול">
               <option value="" disabled selected>בחרו סגנון...</option>
               <option value="תרמילאים">תרמילאים</option>
               <option value="זוגות">זוגות</option>
@@ -489,7 +486,7 @@
           <input
             type="text"
             id="otherDetail"
-            name="otherDetail"
+            name="פירוט נוסף (אחר)"
             placeholder="ספרו לנו..."
           />
         </div>
@@ -497,7 +494,7 @@
         <div class="field">
           <label for="mapChoice">בחירת מפה <span class="req">*</span></label>
           <div class="select-wrap">
-            <select id="mapChoice" name="mapChoice" required>
+            <select id="mapChoice" name="המפה המבוקשת" required>
               <option value="" disabled selected>בחרו יעד...</option>
               <option value="וינה (אוסטריה)">וינה (אוסטריה)</option>
               <option value="פירנצה (איטליה)">פירנצה (איטליה)</option>
@@ -530,7 +527,7 @@
 
         <div class="field">
           <label class="checkbox-wrap">
-            <input type="checkbox" id="terms" name="terms" required />
+            <input type="checkbox" id="terms" name="אישור תקנון" required />
             <span class="checkbox-label">
               אני מאשר/ת קריאה של
               <a href="#תקנון">התקנון</a>
@@ -553,7 +550,7 @@
         </svg>
       </div>
       <p class="success-title">נשלח בהצלחה! 🎉</p>
-      <p class="success-sub">אפליקציית המייל נפתחת כעת.<br>לחצו על "שליחה" כדי להעביר את הפרטים אלינו.</p>
+      <p class="success-sub">תודה! הפרטים התקבלו במערכת והמפה תישלח אליכם בהקדם.</p>
     </div>
 
   </div>
@@ -594,7 +591,7 @@
         setTimeout(() => circle.remove(), 600);
       });
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         form.classList.add('was-validated');
 
@@ -607,32 +604,24 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'שולח...';
 
-        const formData = new FormData(form);
-        const fields = {
-          fullName: "שם מלא",
-          email: "אימייל",
-          whatsapp: "מספר וואטסאפ",
-          flightTime: "מועד טיסה משוער",
-          travelStyle: "סגנון טיול",
-          otherDetail: "פירוט (אחר)",
-          mapChoice: "המפה המבוקשת"
-        };
-        
-        let bodyText = "התקבלו פרטים חדשים מטופס נחיתה:\n\n";
-        for (let [key, value] of formData.entries()) {
-          if (key === 'terms' || !value) continue;
-          const label = fields[key] || key;
-          bodyText += `${label}: ${value}\n`;
-        }
-        
-        const mailtoUrl = `mailto:shirazwebb5@gmail.com?subject=${encodeURIComponent('ליד חדש — בקשת מפה')}&body=${encodeURIComponent(bodyText)}`;
-        
-        // Open the native email application safely via link change
-        window.location.href = mailtoUrl;
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
 
-        // Transition to success screen
-        form.style.display = 'none';
-        successScr.style.display = 'flex';
+          if (response.ok) {
+            form.style.display = 'none';
+            successScr.style.display = 'flex';
+          } else {
+            throw new Error('Error during submission');
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'אני רוצה את המפה!';
+          alert('אירעה שגיאה זמנית בשליחת הטופס. אנא נסה שוב.');
+        }
       });
     })();
   </script>
